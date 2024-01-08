@@ -2,6 +2,7 @@ package com.dongmanee.domain.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -56,6 +57,8 @@ public class SecurityConfig implements WebMvcConfigurer {
 			// HTTP 요청에 대한 인가 설정
 			.authorizeHttpRequests(
 				authorizedRequests -> authorizedRequests
+					.requestMatchers(new AntPathRequestMatcher("/clubs/**", HttpMethod.GET.name()))
+					.permitAll()
 					.requestMatchers(new AntPathRequestMatcher("/login"))
 					.permitAll() // 모든 요청에 대해서 인증 없이 허용
 					.requestMatchers(new AntPathRequestMatcher("/oauth2/**"))
@@ -81,6 +84,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 			.addFilterBefore(new JwtAuthenticationFilter(jwtProvider), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class)
 			.addFilterAfter(clubUserAuthenticationFilter, JwtAuthenticationFilter.class);
+
 		return http.build();
 	}
 
